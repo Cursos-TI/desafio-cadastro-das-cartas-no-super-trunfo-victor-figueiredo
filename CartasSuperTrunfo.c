@@ -23,6 +23,15 @@ typedef struct NodeEstado
     struct NodeEstado *prox;
 } NodeEstado;
 
+NodeEstado *inserirEstado(NodeEstado *lista, char nome[], char id);
+void inserirCidade(NodeEstado *estado, Cidade c);
+NodeEstado *apagarEstado(NodeEstado *lista, char id);
+void listarEstados(NodeEstado *lista);
+Cidade cadastrarCidade(NodeEstado *estado);
+NodeEstado *inserirCarta(NodeEstado *listaEstados, int *proximoIndiceEstado);
+NodeEstado *buscarEstadoPorId(NodeEstado *lista, char id);
+void compararCartas(NodeEstado *lista);
+
 NodeEstado *inserirEstado(NodeEstado *lista, char nome[], char id)
 {
     NodeEstado *novo = (NodeEstado *)malloc(sizeof(NodeEstado));
@@ -79,7 +88,7 @@ void listarEstados(NodeEstado *lista)
 {
     if (!lista)
     {
-        printf("Nenhuma carta cadastrada.\n");
+        printf("\033[0;31mNenhuma carta cadastrada!\033[0m\n\n");
         return;
     }
     for (NodeEstado *e = lista; e; e = e->prox)
@@ -126,9 +135,9 @@ Cidade cadastrarCidade(NodeEstado *estado)
     return c;
 }
 
-void inserirCarta(NodeEstado *listaEstados, int proximoIndiceEstado)
+NodeEstado *inserirCarta(NodeEstado *listaEstados, int *proximoIndiceEstado)
 {
-    if (proximoIndiceEstado >= 8)
+    if (*proximoIndiceEstado >= 8)
     {
         printf("Limite de 8 estados atingido!\n");
     }
@@ -138,11 +147,11 @@ void inserirCarta(NodeEstado *listaEstados, int proximoIndiceEstado)
         printf("Digite o nome do Estado: ");
         scanf(" %29s", nomeEstado);
 
-        char estadoId = (char)('A' + proximoIndiceEstado);
+        char estadoId = (char)('A' + *proximoIndiceEstado);
         // cria e recebe ponteiro do novo estado
         listaEstados = inserirEstado(listaEstados, nomeEstado, estadoId);
         NodeEstado *novoEstado = listaEstados; // inserido no inicio
-        proximoIndiceEstado++;                 // avanca SEMPRE (nao decrementa se apagar)
+        (*proximoIndiceEstado)++;              // avanca SEMPRE (nao decrementa se apagar)
 
         // cadastra 4 cidades para esse estado
         for (int i = 0; i < 4; i++)
@@ -151,6 +160,7 @@ void inserirCarta(NodeEstado *listaEstados, int proximoIndiceEstado)
             inserirCidade(novoEstado, c);
         }
     }
+    return listaEstados;
 }
 
 NodeEstado *buscarEstadoPorId(NodeEstado *lista, char id)
@@ -235,7 +245,7 @@ int main()
         {
             if (listaEstados == NULL)
             {
-                printf("Nenhuma carta cadastrada!\n");
+                printf("\033[0;31mNenhuma carta cadastrada!\033[0m\n\n");
             }
             else
             {
@@ -244,14 +254,23 @@ int main()
         }
         else if (opcao == 3)
         {
-            inserirCarta(listaEstados, proximoIndiceEstado);
+            listaEstados = inserirCarta(listaEstados, &proximoIndiceEstado);
         }
         else if (opcao == 4)
         {
-            printf("Função de apagar ainda não implementada!\n");
+            char apagarId;
+            printf("Digite o ID do estado a apagar: ");
+            scanf(" %c", &apagarId);
+            listaEstados = apagarEstado(listaEstados, apagarId);
         }
 
     } while (opcao != 0);
 
+    while (listaEstados)
+    {
+        NodeEstado *tmp = listaEstados;
+        listaEstados = listaEstados->prox;
+        free(tmp);
+    }
     return 0;
 }
