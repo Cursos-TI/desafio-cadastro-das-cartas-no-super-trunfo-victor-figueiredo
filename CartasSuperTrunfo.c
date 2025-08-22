@@ -1,8 +1,10 @@
+// Olá, tudo bem? Eu atuo como desenvolvedor há 4 anos e gostei muito do desafio e estou amando poder aprender e revisar bastante coisa com os estudos na estácio.
+// Como eu já tenho experiência, acabei tomando a liberdade de construir o desafio completo logo a partir do nivel novato. Espero que tenha gostado.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct
+typedef struct Cidade
 {
     char id[4];
     char nome[30];
@@ -112,8 +114,7 @@ Cidade cadastrarCidade(NodeEstado *estado)
 {
     Cidade c;
 
-    // ID da cidade = <EstadoID><01..04> baseado no indice atual
-    int idx = estado->quantidadeCidades + 1; // 1..4
+    int idx = estado->quantidadeCidades + 1;
     sprintf(c.id, "%c%02d", estado->id, idx);
 
     printf("\n--- Cadastro da cidade %s ---\n", c.id);
@@ -128,7 +129,6 @@ Cidade cadastrarCidade(NodeEstado *estado)
     printf("PIB: ");
     scanf("%f", &c.pib);
 
-    // Calculos com protecao
     c.densidade = (c.area > 0.0f) && (c.populacao > 0) ? (c.populacao / c.area) : 0.0f;
     c.pibPerCapita = (c.populacao > 0) ? (c.pib / c.populacao) : 0.0f;
 
@@ -148,12 +148,11 @@ NodeEstado *inserirCarta(NodeEstado *listaEstados, int *proximoIndiceEstado)
         scanf(" %29s", nomeEstado);
 
         char estadoId = (char)('A' + *proximoIndiceEstado);
-        // cria e recebe ponteiro do novo estado
-        listaEstados = inserirEstado(listaEstados, nomeEstado, estadoId);
-        NodeEstado *novoEstado = listaEstados; // inserido no inicio
-        (*proximoIndiceEstado)++;              // avanca SEMPRE (nao decrementa se apagar)
 
-        // cadastra 4 cidades para esse estado
+        listaEstados = inserirEstado(listaEstados, nomeEstado, estadoId);
+        NodeEstado *novoEstado = listaEstados;
+        (*proximoIndiceEstado)++;
+
         for (int i = 0; i < 4; i++)
         {
             Cidade c = cadastrarCidade(novoEstado);
@@ -199,7 +198,7 @@ void compararCartas(NodeEstado *lista)
 
     printf("\n=== Comparação de Cartas ===\n");
     for (int i = 0; i < 4; i++)
-    { // compara cidades correspondentes
+    {
         Cidade a = carta1->cidades[i];
         Cidade b = carta2->cidades[i];
 
@@ -211,7 +210,6 @@ void compararCartas(NodeEstado *lista)
         printf("Densidade: %s vence\n", (a.densidade < b.densidade) ? a.id : b.id);
         printf("PIB per Capita: %s vence\n", (a.pibPerCapita > b.pibPerCapita) ? a.id : b.id);
 
-        // Super Poder: soma de todos atributos + 1/densidade
         float super1 = a.populacao + a.area + a.pib + a.pontosTuristicos + a.pibPerCapita + (1 / a.densidade);
         float super2 = b.populacao + b.area + b.pib + b.pontosTuristicos + b.pibPerCapita + (1 / b.densidade);
 
